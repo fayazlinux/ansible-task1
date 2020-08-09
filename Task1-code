@@ -1,0 +1,51 @@
+- hosts: all
+  tasks:
+    - name: Add Docker Repo
+      yum_repository:
+       name: Dockerrepo
+       description: Dockerrepo
+       baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
+       gpgcheck: no
+
+
+    - name: Install Docker
+      command: "yum install docker-ce -y --nobest"
+
+
+    - name: Start service Docker
+      service:
+       name: docker
+       state: started
+
+    - name: install the Python Remote System
+      yum:
+       name: python36
+
+    - name: Install Docker-py
+      command: "pip3 install docker-py"
+      
+       - name: create web folder Remore System
+      file:
+       path: /web
+       state: directory
+
+    - name: copying file into remote server
+      copy:
+       src: /task1/index.html
+       dest: /web
+
+
+    - name: pull an image
+      docker_image:
+       name: fayazlinux/fayazhttpd:v30
+       source: pull
+
+    - name: Create a data container
+      docker_container:
+       name: mydata
+       image: fayazlinux/fayazhttpd:v30
+       ports:
+        - "80:80"
+       volumes:
+       - /web:/var/www/html/
+ 
